@@ -5,9 +5,50 @@ from emoji import emojize
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram import ReplyKeyboardMarkup
 
-from bot.calculator import calc_kbd, show_calculator
 from bot.commands import kbd_main_menu
-from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING
+from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING, CALCULATOR
+
+
+def calc_kbd():
+    return InlineKeyboardMarkup([InlineKeyboardButton(emojize(x, True), callback_data=x) for x in t] for t in
+                                [['1', '2', '3'],
+                                 ['4', '5', '6'],
+                                 ['7', '8', '9'],
+                                 [':arrow_backward:', '0', '000'],
+                                 [':white_check_mark:']])
+
+
+def show_calculator(bot, update, user_data):
+    query = update.callback_query
+    user_data['calc'] = ''
+    user_data['calc:orig_msg'] = query.data + ' paid,'
+    bot.editMessageText(text="%s paid, how much? \n ----------------------------------" % query.data,
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        reply_markup=calc_kbd())
+    bot.answerCallbackQuery(query.id)
+
+    return CALCULATOR
+
+
+def key_pressed(bot, update, user_data):
+    query = update.callback_query
+    if query.data == ':white_check_mark:':
+        del user_data['calc:orig_msg']
+        bot.answerCallbackQuery(query.id)
+
+        return user_data.get('next state')(bot, update, user_data, user_data['calc'])
+    if query.data == ':arrow_backward:':
+        user_data['calc'] = user_data['calc'][:-1]
+    else:
+        user_data['calc'] += query.data
+    bot.answerCallbackQuery(query.id)
+    bot.editMessageText(
+        user_data['calc:orig_msg'] + ' how much? %s\n ----------------------------------' % user_data['calc'],
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id, reply_markup=calc_kbd())
+    return CALCULATOR
+
 
 
 def add_payment(bot, update, user_data=None):
@@ -107,9 +148,20 @@ def message(bot, update, user_data=None):
 def submit_payment(bot, update, user_data):
     update.message.reply_text("Payment Added", reply_markup=kbd_main_menu)
     payment = user_data['uncommitted_payment'].copy()
-    payment['description']=payment['description'][1:]
+    payment['description'] = payment['description'][1:]
     user_data['payments'].append(payment)
     user_data['uncommitted_payment'] = {}
     return CHOOSING
 
 
+def list_transactions(bot, update, user_data):
+    response = ''
+    for payment in user_data['payments']:
+        response += '*%s* pays %0.2f for *%s* ' % (
+            payment['payee'], locale.format('%0.2f',payment['amount'], grouping=True),
+            ','.join(payment['beneficiary']))
+        if payment.get('description'):
+            response += '_[%s]_' % payment['description']
+        response += '.\n'
+    update.message.reply_text(response, parse_mode='Markdown', reply_markup=kbd_main_menu)
+    return CHOOSING

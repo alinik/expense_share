@@ -8,9 +8,10 @@ from telegram.ext import RegexHandler
 from telegram.ext import Updater
 
 from bot import states
-from bot.calculator import key_pressed, show_calculator
-from .commands import start, cmd_main_menu, add_member, add_member_cb, error, welcome_admins, done, show_result
-from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment
+# from bot.calculator import key_pressed
+from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset
+from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment, \
+    list_transactions, key_pressed
 
 
 def start_bot(token, admin_ids):
@@ -32,6 +33,8 @@ def start_bot(token, admin_ids):
                                add_member, pass_user_data=True),
                 RegexHandler('^Add Payment$',
                              add_payment, pass_user_data=True),
+                RegexHandler('^List Transactions$',
+                             list_transactions, pass_user_data=True),
 
             ],
 
@@ -58,7 +61,10 @@ def start_bot(token, admin_ids):
 
         },
 
-        fallbacks=[RegexHandler('^[dD]one$', done, pass_user_data=True)]
+        fallbacks=[
+            CommandHandler('reset', reset, pass_user_data=True),
+            MessageHandler(Filters.all, reset,pass_user_data=True),
+        ]
     )
 
     dp.add_handler(conv_handler)

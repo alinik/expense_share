@@ -16,14 +16,28 @@ kbd_main_menu = ReplyKeyboardMarkup(keyboard=[['Add Member', 'Add Payment'], ['S
 botan = Botan(BOTAN_TOKEN)
 
 
+def reset(bot,update,user_data):
+    user_data.clear()
+    user_data['payments'] = []
+    user_data['members'] = set()
+    update.message.reply_text("Let's Start ..."
+                            ,
+                              reply_markup=kbd_main_menu)
+
+    return CHOOSING
+
+
 @assign_first_to("admin")
 def start(bot, update, user_data=None):
     for ids in ADMIN_IDS:
-        bot.sendMessage(chat_id=ids,text='New user joined. %s %s (@%s)'%(update.message.chat.first_name,update.message.chat.last_name,update.message.chat.username))
+        bot.sendMessage(chat_id=ids, text='New user joined. %s %s (@%s)' % (
+            update.message.chat.first_name, update.message.chat.last_name,
+            update.message.chat.username))
     logging.info('START chat: %s', update.message.chat_id)
-    botan.track(update.message, 'start')
+    botan.track(update.message, '/start')
     update.message.reply_text("Hi, I will calculate your Expense Share",
                               reply_markup=kbd_main_menu)
+    user_data.clear()
     user_data['payments'] = []
     user_data['members'] = set()
     return CHOOSING
@@ -35,11 +49,11 @@ def cmd_main_menu(bot, update, user_data):
 
 def show_result(bot, update, user_data):
     response = ''
-    botan.track(update.message,'show result')
+    botan.track(update.message, 'show result')
     for payer, payee, amount in optimized(calculate_owns(user_data)):
         response += '%s :arrow_right: %s :moneybag: %s\n' % (payer, payee, amount)
     update.message.reply_text(emojize(response, True))
-
+    return CHOOSING
 
 def add_member(bot, update, user_data=None):
     logging.info('ADDMEMBER chat: %s', update.message.chat_id)
