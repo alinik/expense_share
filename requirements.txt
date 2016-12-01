@@ -3,4 +3,3 @@ emoji
 ownbot
 redis
 hiredis
-x

@@ -1,0 +1,146 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: Expense Share\n"
+"Language: fa\n"
+
+#: bot/commands.py:41
+msgid "Hi, I will calculate your Expense Share"
+msgstr "سلام. من به شما برای تقسیم هزینه های مشترک کمک می کنم"
+
+#: bot/payment_commands.py:16
+msgid "1"
+msgstr "۱"
+
+#: bot/payment_commands.py:16
+msgid "2"
+msgstr "۲"
+
+#: bot/payment_commands.py:16
+msgid "3"
+msgstr "۳"
+
+#: bot/payment_commands.py:17
+msgid "4"
+msgstr "۴"
+
+#: bot/payment_commands.py:17
+msgid "5"
+msgstr "۵"
+
+#: bot/payment_commands.py:17
+msgid "6"
+msgstr "۶"
+
+#: bot/payment_commands.py:18
+msgid "7"
+msgstr "۷"
+
+#: bot/payment_commands.py:18
+#, fuzzy
+msgid "8"
+msgstr "۸"
+
+#: bot/payment_commands.py:18
+msgid "9"
+msgstr "۹"
+
+#: bot/payment_commands.py:19
+msgid "0"
+msgstr "۰"
+
+#: bot/payment_commands.py:19
+msgid "000"
+msgstr "۰۰۰"
+
+#: bot/payment_commands.py:19
+msgid ":arrow_backward:"
+msgstr ":arrow_backward:"
+
+#: bot/payment_commands.py:20
+msgid ":white_check_mark:"
+msgstr ":white_check_mark:"
+
+#: bot/payment_commands.py:26
+msgid " paid,"
+msgstr " پرداخت کرده. "
+
+#: bot/payment_commands.py:28 bot/payment_commands.py:50
+msgid " how much?"
+msgstr " چقدر؟"
+
+#: bot/payment_commands.py:61
+msgid "Who Paid? "
+msgstr "چه کسی پرداخت کرد؟ "
+
+#: bot/payment_commands.py:73
+msgid "%s Paid for %s, who was beneficiary?"
+msgstr "%s مبلغ %s را پرداخت کرده، چه کسانی ذی نفع هستند؟"
+
+#: bot/payment_commands.py:84
+msgid "paid,"
+msgstr "پرداخت،"
+
+#: bot/payment_commands.py:97 bot/payment_commands.py:130
+msgid "So, %s paid %s for %s."
+msgstr "پس %s مبلغ %s را برای %s پرداخت کرده است."
+
+#: bot/payment_commands.py:100
+msgid "And anything to add or Done?"
+msgstr "نیاز است مطلب دیگری اضافه شود یا \"تمام\""
+
+#: bot/payment_commands.py:147
+msgid "Payment Added"
+msgstr "هزینه اضافه شد."
+
+#: bot/payment_commands.py:158
+msgid "*%s* pays %s for *%s* "
+msgstr "*%s* مبلغ  %s  برای *%s* پرداخت کرد."
+
+#: bot/commands.py:28
+msgid "Let's Start ..."
+msgstr "شروع کنیم ..."
+
+#: bot/commands.py:57
+msgid "%s :arrow_right: %s :moneybag: %s\n"
+""
+msgstr "%s :arrow_right: %s :moneybag: %s\n"
+""
+
+#: bot/commands.py:79
+msgid "Aha"
+msgstr "آهان"
+
+#: bot/commands.py:94
+msgid "Lets Restart!"
+msgstr "دوباره شروع کنیم!"
+
+#: bot/commands.py:18
+msgid "Add Member"
+msgstr "افزودن عضو"
+
+#: bot/commands.py:18
+msgid "Add Payment"
+msgstr "افزودن هزینه"
+
+#: bot/commands.py:18
+msgid "Help"
+msgstr "کمک"
+
+#: bot/commands.py:18
+msgid "Show Result"
+msgstr "نمایش نتایج"
+
+#: bot/commands.py:64
+msgid "Please type new Member Name"
+msgstr "لطفا نام فرد جدید را وارد کنید"
+
+#: 
+msgid "Done"
+msgstr "تمام"
+
+msgid "List Transactions"
+msgstr "لیست هزینه ها"

@@ -65,7 +65,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
-*.mo
+#*.mo
 *.pot
 *.log
 local_settings.py

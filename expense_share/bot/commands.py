@@ -1,3 +1,4 @@
+import gettext
 import logging
 
 from emoji import emojize
@@ -10,19 +11,22 @@ from calculator import calculate_owns
 from calculator import optimized
 from settings import BOTAN_TOKEN, ADMIN_IDS
 
-kbd_main_menu = ReplyKeyboardMarkup(keyboard=[['Add Member', 'Add Payment'], ['Show Result', 'Help']],
-                                    resize_keyboard=True,
-                                    one_time_keyboard=True)
+fa = gettext.translation('messages', localedir='locale', languages=['fa'])
+fa.install()
+_ = fa.gettext
+
+kbd_main_menu = ReplyKeyboardMarkup(
+    keyboard=[[_('Add Member'), _('Add Payment')], [_('Show Result'), _('List Transactions'), _('Help')]],
+    resize_keyboard=True,
+    one_time_keyboard=True)
 botan = Botan(BOTAN_TOKEN)
 
 
-def reset(bot,update,user_data):
+def reset(bot, update, user_data):
     user_data.clear()
     user_data['payments'] = []
     user_data['members'] = set()
-    update.message.reply_text("Let's Start ..."
-                            ,
-                              reply_markup=kbd_main_menu)
+    update.message.reply_text(_("Let's Start ..."), reply_markup=kbd_main_menu)
 
     return CHOOSING
 
@@ -35,7 +39,7 @@ def start(bot, update, user_data=None):
             update.message.chat.username))
     logging.info('START chat: %s', update.message.chat_id)
     botan.track(update.message, '/start')
-    update.message.reply_text("Hi, I will calculate your Expense Share",
+    update.message.reply_text(_("Hi, I will calculate your Expense Share"),
                               reply_markup=kbd_main_menu)
     user_data.clear()
     user_data['payments'] = []
@@ -51,13 +55,14 @@ def show_result(bot, update, user_data):
     response = ''
     botan.track(update.message, 'show result')
     for payer, payee, amount in optimized(calculate_owns(user_data)):
-        response += '%s :arrow_right: %s :moneybag: %s\n' % (payer, payee, amount)
+        response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
     update.message.reply_text(emojize(response, True))
     return CHOOSING
 
+
 def add_member(bot, update, user_data=None):
     logging.info('ADDMEMBER chat: %s', update.message.chat_id)
-    bot.sendMessage(chat_id=update.message.chat_id, text='Please type new Member Name')
+    bot.sendMessage(chat_id=update.message.chat_id, text=_('Please type new Member Name'))
     return ADD_MEMBER
 
 
@@ -72,7 +77,7 @@ def add_member_cb(bot, update, user_data=None):
         member = text
     user_data['members'].add(member)
     logging.info('Members: %s', user_data['members'])
-    bot.sendMessage(chat_id=update.message.chat_id, text='Aha', reply_markup=kbd_main_menu)
+    bot.sendMessage(chat_id=update.message.chat_id, text=_('Aha'), reply_markup=kbd_main_menu)
     return CHOOSING
 
 
@@ -87,6 +92,6 @@ def welcome_admins(bot, admin_ids):
 
 
 def done(bot, update, user_data):
-    update.message.reply_text("Lets Restart!", reply_markup=kbd_main_menu)
+    update.message.reply_text(_("Lets Restart!"), reply_markup=kbd_main_menu)
     user_data.clear()
     return CHOOSING
