@@ -9,7 +9,7 @@ from telegram.ext import Updater
 
 from bot import states
 from bot.calculator import key_pressed, show_calculator
-from .commands import start, cmd_main_menu, add_member, add_member_cb, error, welcome_admins, done
+from .commands import start, cmd_main_menu, add_member, add_member_cb, error, welcome_admins, done, show_result
 from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment
 
 
@@ -23,8 +23,8 @@ def start_bot(token, admin_ids):
 
         states={
             states.CHOOSING: [
-                RegexHandler('^(Show Result|Help)$',
-                             cmd_main_menu,
+                RegexHandler('^Show Result$',
+                             show_result,
                              pass_user_data=True),
                 RegexHandler('^Add Member$',
                              add_member, pass_user_data=True),

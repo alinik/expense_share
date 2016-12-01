@@ -61,11 +61,11 @@ def optimized(data):
             # print(t,abs(sum([v for k,v in t ])))
             if abs(sum([v for k, v in t])) < MIN_ACCEPTED:
                 new_data = dict(t)
-                result.append(calculate_payables(new_data))
+                result+=calculate_payables(new_data)
                 # print(result)
                 _ = [data.pop(k) for k, v in t]
     if data:
-        result.append(calculate_payables(data))
+        result+=calculate_payables(data)
     return result
 
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
                       {'description': '\nHome', 'beneficiary': {'B', 'C', 'A'}, 'amount': 69000, 'payee': 'C'}]}
     m = calculate_owns(t)
     m = dict(a=100, b=50, c=-40, d=-10, e=-100)
-    m = dict(a=10, b=-49, c=-50, d=65, e=-75, f=-99)
+    m = dict(a=10, b=-49, c=-50, d=65, e=-75, f=-99) # http://stackoverflow.com/a/1163209/501979
     print('M:', m)
     v = calculate_payables(m)
     print('V', v)
