@@ -102,8 +102,7 @@ def choose_beneficiary(bot, update, user_data=None):
             message_id=query.message.message_id)
         bot.sendMessage(chat_id=query.message.chat_id, text=_('And anything to add or Done?'),
                         reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[['Done']],
-                            # keyboard=[['Add Location', 'Add Description'], ['Add Image', 'Done']],
+                            keyboard=[[_('Done'),_('Cancel')]],
                             resize_keyboard=True,
                             one_time_keyboard=True))
         bot.answerCallbackQuery(query.id)
@@ -147,10 +146,13 @@ def message(bot, update, user_data=None):
 
 
 def submit_payment(bot, update, user_data):
-    update.message.reply_text(_("Payment Added"), reply_markup=kbd_main_menu)
-    payment = user_data['uncommitted_payment'].copy()
-    payment['description'] = payment['description'][1:]
-    user_data['payments'].append(payment)
+    if update.message.text in ['Cancel',_('Cancel')]:
+        update.message.reply_text(_("Payment Cancelled"),reply_markup=kbd_main_menu)
+    else:
+        update.message.reply_text(_("Payment Added"), reply_markup=kbd_main_menu)
+        payment = user_data['uncommitted_payment'].copy()
+        payment['description'] = payment['description'][1:]
+        user_data['payments'].append(payment)
     user_data['uncommitted_payment'] = {}
     return CHOOSING
 

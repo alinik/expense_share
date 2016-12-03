@@ -40,7 +40,6 @@ msgid "7"
 msgstr "۷"
 
 #: bot/payment_commands.py:18
-#, fuzzy
 msgid "8"
 msgstr "۸"
 
@@ -96,6 +95,8 @@ msgstr "نیاز است مطلب دیگری اضافه شود یا \"تمام\""
 msgid "Payment Added"
 msgstr "هزینه اضافه شد."
 
+msgid "Payment Cancelled"
+msgstr "هزینه ثبت نشد"
 #: bot/payment_commands.py:158
 msgid "*%s* pays %s for *%s* "
 msgstr "*%s* مبلغ  %s  برای *%s* پرداخت کرد."
@@ -141,6 +142,9 @@ msgstr "لطفا نام فرد جدید را وارد کنید"
 #: 
 msgid "Done"
 msgstr "تمام"
+
+msgid "Cancel"
+msgstr "انصراف"
 
 msgid "List Transactions"
 msgstr "لیست هزینه ها"

@@ -60,7 +60,7 @@ def start_bot(token, admin_ids):
                 CallbackQueryHandler(choose_payee, pass_user_data=True)
             ],
             states.ADD_PAYMENT_2: [
-                RegexHandler('^(Done|%s)$' % _("Done"), submit_payment, pass_user_data=True),
+                RegexHandler('^(Done|Cancel|%s|%s)$' % (_("Done"), _('Cancel')), submit_payment, pass_user_data=True),
                 CallbackQueryHandler(choose_beneficiary, pass_user_data=True),
                 MessageHandler(Filters.all, message, pass_user_data=True),
             ],
