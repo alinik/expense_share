@@ -1,15 +1,15 @@
-import locale
 import logging
-import gettext
+
 from emoji import emojize
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram import ReplyKeyboardMarkup
 
+import locale
 from bot.commands import kbd_main_menu
 from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING, CALCULATOR
-fa = gettext.translation('messages', localedir='locale', languages=['fa'])
-fa.install()
-_ = fa.gettext
+from utils import get_translate
+
+_=get_translate('fa')
 
 def calc_kbd():
     return InlineKeyboardMarkup([InlineKeyboardButton(emojize(x, True), callback_data=x) for x in t] for t in

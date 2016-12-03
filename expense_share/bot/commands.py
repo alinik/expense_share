@@ -1,4 +1,3 @@
-import gettext
 import logging
 
 from emoji import emojize
@@ -11,15 +10,16 @@ from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
 from calculator import optimized
 from settings import BOTAN_TOKEN, ADMIN_IDS, SENTRY_DSN
+from utils import get_translate
 
 client = Client(SENTRY_DSN)
 
-fa = gettext.translation('messages', localedir='locale', languages=['fa'])
-fa.install()
-_ = fa.gettext
+_=get_translate('fa')
 
 kbd_main_menu = ReplyKeyboardMarkup(
-    keyboard=[[_('Add Member'), _('Add Payment')], [_('Show Result'), _('List Transactions'), _('Help')]],
+    keyboard=[[_('Add Member'), _('Add Payment')],
+              [_('Show Result'), _('List Transactions'), _('Help')],
+              [_('Lets Restart!')]],
     resize_keyboard=True,
     one_time_keyboard=True)
 botan = Botan(BOTAN_TOKEN)
@@ -61,7 +61,7 @@ def show_result(bot, update, user_data):
         response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
     if not response:
         response = _('The result is empty')
-    update.message.reply_text(emojize(response, True),reply_markup=kbd_main_menu)
+    update.message.reply_text(emojize(response, True), reply_markup=kbd_main_menu)
     return CHOOSING
 
 
@@ -89,7 +89,7 @@ def add_member_cb(bot, update, user_data=None):
 def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
 
-    client.captureMessage(error, extra={'update':update.to_dict()})
+    client.captureMessage(error, extra={'update': update.to_dict()})
 
 
 def welcome_admins(bot, admin_ids):
