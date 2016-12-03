@@ -3,13 +3,16 @@ import logging
 
 from emoji import emojize
 from ownbot.auth import assign_first_to
+from raven import Client
 from telegram import ReplyKeyboardMarkup
 from telegram.contrib.botan import Botan
 
 from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
 from calculator import optimized
-from settings import BOTAN_TOKEN, ADMIN_IDS
+from settings import BOTAN_TOKEN, ADMIN_IDS, SENTRY_DSN
+
+client = Client(SENTRY_DSN)
 
 fa = gettext.translation('messages', localedir='locale', languages=['fa'])
 fa.install()
@@ -56,8 +59,8 @@ def show_result(bot, update, user_data):
     botan.track(update.message, 'show result')
     for payer, payee, amount in optimized(calculate_owns(user_data)):
         response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
-    if not response:
-        response = _('The result is empty')
+    # if not response:
+    #     response = _('The result is empty')
     update.message.reply_text(emojize(response, True))
     return CHOOSING
 
@@ -85,6 +88,9 @@ def add_member_cb(bot, update, user_data=None):
 
 def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
+
+    client.context.merge({'update': update, 'error': error})
+    client.captureMessage('exception happen')
 
 
 def welcome_admins(bot, admin_ids):

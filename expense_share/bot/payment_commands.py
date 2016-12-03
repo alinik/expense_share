@@ -161,5 +161,7 @@ def list_transactions(bot, update, user_data):
         if payment.get('description'):
             response += '_[%s]_' % payment['description']
         response += '.\n'
+    if not response:
+        response = _('The result is empty')
     update.message.reply_text(response, parse_mode='Markdown', reply_markup=kbd_main_menu)
     return CHOOSING
