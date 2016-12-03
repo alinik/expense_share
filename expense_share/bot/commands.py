@@ -56,6 +56,8 @@ def show_result(bot, update, user_data):
     botan.track(update.message, 'show result')
     for payer, payee, amount in optimized(calculate_owns(user_data)):
         response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
+    if not response:
+        response = _('The result is empty')
     update.message.reply_text(emojize(response, True))
     return CHOOSING
 
