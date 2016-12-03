@@ -59,9 +59,9 @@ def show_result(bot, update, user_data):
     botan.track(update.message, 'show result')
     for payer, payee, amount in optimized(calculate_owns(user_data)):
         response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
-    # if not response:
-    #     response = _('The result is empty')
-    update.message.reply_text(emojize(response, True))
+    if not response:
+        response = _('The result is empty')
+    update.message.reply_text(emojize(response, True),reply_markup=kbd_main_menu)
     return CHOOSING
 
 
@@ -89,8 +89,7 @@ def add_member_cb(bot, update, user_data=None):
 def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
 
-    client.context.merge({'update': update, 'error': error})
-    client.captureMessage('exception happen')
+    client.captureMessage(error, extra={'update':update.to_dict()})
 
 
 def welcome_admins(bot, admin_ids):

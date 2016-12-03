@@ -147,3 +147,6 @@ msgstr "لیست هزینه ها"
 
 msgid "The result is empty"
 msgstr "هیچ چیز برای نمایش وجود ندارد"
+
+msgid "Please add some members first!"
+msgstr "لطفا ابتدا چند عضو اضافه کنید."

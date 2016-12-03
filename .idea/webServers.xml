@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="18d6422c-ce0e-4e33-a369-c8987f71b2b5" name="bot" url="http://bot.nikneshan.com">
+        <fileTransfer host="bot.nikneshan.com" port="50022" privateKey="$USER_HOME$/.ssh/id_rsa" rootFolder="/home/ali" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="50022" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -55,6 +55,9 @@ def key_pressed(bot, update, user_data):
 
 
 def add_payment(bot, update, user_data=None):
+    if not user_data['members']:
+        update.message.reply_text(_('Please add some members first!'),reply_markup=kbd_main_menu)
+        return CHOOSING
     user_data['uncommitted_payment'] = {'beneficiary': set(), 'amount': 0, 'description': '', 'payee': ''}
     members = InlineKeyboardMarkup([[InlineKeyboardButton(x, callback_data=x)] for x in user_data['members']])
 
