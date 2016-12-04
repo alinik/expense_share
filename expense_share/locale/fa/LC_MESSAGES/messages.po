@@ -108,7 +108,7 @@ msgstr "شروع کنیم ..."
 #: bot/commands.py:57
 msgid "%s :arrow_right: %s :moneybag: %s\n"
 ""
-msgstr "%s :arrow_right: %s :moneybag: %s\n"
+msgstr "%s :arrow_left: %s :moneybag: %s\n"
 ""
 
 #: bot/commands.py:79
