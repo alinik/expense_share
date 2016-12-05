@@ -41,6 +41,8 @@ def start(bot, update, user_data=None):
         bot.sendMessage(chat_id=ids, text='New user joined. %s %s (@%s)' % (
             update.message.chat.first_name, update.message.chat.last_name,
             update.message.chat.username))
+
+
     logging.info('START chat: %s', update.message.chat_id)
     botan.track(update.message, '/start')
     update.message.reply_text(_("Hi, I will calculate your Expense Share"),
@@ -48,6 +50,7 @@ def start(bot, update, user_data=None):
     user_data.clear()
     models.User.flush_members(update.message.chat_id)
     models.User.flush_payments(update.message.chat_id)
+    models.Bot.add_member(update.message.chat_id)
     return CHOOSING
 
 
@@ -94,8 +97,9 @@ def error(bot, update, error):
 
 
 def welcome_admins(bot, admin_ids):
+    members_count = models.Bot.members_count()
     for admin_id in admin_ids:
-        bot.sendMessage(chat_id=admin_id, text='Starting bot...\n\n\n*Bot started*\n\n\nHello *Admin*',
+        bot.sendMessage(chat_id=admin_id, text='Starting bot...\n\n\n*Bot started with %s users*\n\n\nHello *Admin*'%members_count,
                         parse_mode='Markdown')
 
 
