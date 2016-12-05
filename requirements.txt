@@ -4,3 +4,4 @@ ownbot
 redis
 hiredis
 raven
+ujson

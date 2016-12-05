@@ -154,3 +154,6 @@ msgstr "هیچ چیز برای نمایش وجود ندارد"
 
 msgid "Please add some members first!"
 msgstr "لطفا ابتدا چند عضو اضافه کنید."
+
+msgid "I couldn't understand!"
+msgstr "من متوجه نشدم!"

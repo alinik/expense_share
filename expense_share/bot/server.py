@@ -1,5 +1,3 @@
-from gettext import gettext as _
-
 from ownbot.admincommands import AdminCommands
 from telegram.ext import CallbackQueryHandler
 from telegram.ext import CommandHandler
@@ -11,7 +9,7 @@ from telegram.ext import Updater
 
 from bot import states
 from utils import get_translate
-from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset
+from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset, bad_command
 from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment, \
     list_transactions, key_pressed
 
@@ -25,7 +23,7 @@ def start_bot(token, admin_ids):
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start, pass_user_data=True),
-                      MessageHandler(Filters.all, start, pass_user_data=True)],
+                      MessageHandler(Filters.all, bad_command, pass_user_data=True)],
 
         states={
             states.CHOOSING: [
@@ -72,7 +70,7 @@ def start_bot(token, admin_ids):
 
         fallbacks=[
             CommandHandler('reset', reset, pass_user_data=True),
-            MessageHandler(Filters.all, reset, pass_user_data=True),
+            MessageHandler(Filters.all, bad_command, pass_user_data=True),
         ]
     )
 

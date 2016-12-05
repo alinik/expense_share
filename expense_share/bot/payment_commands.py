@@ -5,11 +5,13 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram import ReplyKeyboardMarkup
 
 import locale
+import models
 from bot.commands import kbd_main_menu
 from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING, CALCULATOR
 from utils import get_translate
 
-_=get_translate('fa')
+_ = get_translate('fa')
+
 
 def calc_kbd():
     return InlineKeyboardMarkup([InlineKeyboardButton(emojize(x, True), callback_data=x) for x in t] for t in
@@ -55,28 +57,31 @@ def key_pressed(bot, update, user_data):
 
 
 def add_payment(bot, update, user_data=None):
-    if not user_data['members']:
-        update.message.reply_text(_('Please add some members first!'),reply_markup=kbd_main_menu)
+    members = models.User.get_members(update.message.chat_id)
+    if not members:
+        update.message.reply_text(_('Please add some members first!'), reply_markup=kbd_main_menu)
         return CHOOSING
     user_data['uncommitted_payment'] = {'beneficiary': set(), 'amount': 0, 'description': '', 'payee': ''}
-    members = InlineKeyboardMarkup([[InlineKeyboardButton(x, callback_data=x)] for x in user_data['members']])
+    kbd_members = InlineKeyboardMarkup([[InlineKeyboardButton(x, callback_data=x)] for x in members])
 
-    update.message.reply_text(_('Who Paid? '), reply_markup=members)
+    update.message.reply_text(_('Who Paid? '), reply_markup=kbd_members)
     return ADD_PAYMENT
 
 
 def get_amount(bot, update, user_data=None, amount=0):
     query = update.callback_query
-    members = InlineKeyboardMarkup(
+    members = models.User.get_members(query.message.chat_id)
+
+    kbd_members = InlineKeyboardMarkup(
         [[InlineKeyboardButton(emojize(':grey_question: %s ' % x, use_aliases=True), callback_data=x)] for x in
-         user_data['members']])
+         members])
 
     user_data['uncommitted_payment']['amount'] = int(amount)
     bot.editMessageText(
         text=_('%s Paid for %s, who was beneficiary?') % (user_data['uncommitted_payment']['payee'], amount),
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-        reply_markup=members)
+        reply_markup=kbd_members)
     return ADD_PAYMENT_2
 
 
@@ -92,6 +97,7 @@ def choose_payee(bot, update, user_data=None):
     return show_calculator(bot, update, user_data)
 
 
+# noinspection PyUnresolvedReferences
 def choose_beneficiary(bot, update, user_data=None):
     query = update.callback_query
     u = user_data['uncommitted_payment']
@@ -102,7 +108,7 @@ def choose_beneficiary(bot, update, user_data=None):
             message_id=query.message.message_id)
         bot.sendMessage(chat_id=query.message.chat_id, text=_('And anything to add or Done?'),
                         reply_markup=ReplyKeyboardMarkup(
-                            keyboard=[[_('Done'),_('Cancel')]],
+                            keyboard=[[_('Done'), _('Cancel')]],
                             resize_keyboard=True,
                             one_time_keyboard=True))
         bot.answerCallbackQuery(query.id)
@@ -117,7 +123,7 @@ def choose_beneficiary(bot, update, user_data=None):
     percentage = 0
     if beneficiary:
         percentage = 100.0 / len(beneficiary)
-    for item in user_data['members']:
+    for item in models.User.get_members(query.message.chat_id):
         status = ':grey_question:'
         p = 0
         if item in beneficiary:
@@ -146,20 +152,24 @@ def message(bot, update, user_data=None):
 
 
 def submit_payment(bot, update, user_data):
-    if update.message.text in ['Cancel',_('Cancel')]:
-        update.message.reply_text(_("Payment Cancelled"),reply_markup=kbd_main_menu)
+    if update.message.text in ['Cancel', _('Cancel')]:
+        update.message.reply_text(_("Payment Cancelled"), reply_markup=kbd_main_menu)
     else:
         update.message.reply_text(_("Payment Added"), reply_markup=kbd_main_menu)
         payment = user_data['uncommitted_payment'].copy()
         payment['description'] = payment['description'][1:]
-        user_data['payments'].append(payment)
+        models.User.add_payment(update.message.chat_id, payment)
+
     user_data['uncommitted_payment'] = {}
     return CHOOSING
 
 
+# noinspection PyUnresolvedReferences
 def list_transactions(bot, update, user_data):
     response = ''
-    for payment in user_data['payments']:
+    payments = models.User.get_payments(update.message.chat_id)
+
+    for payment in payments:
         response += _('*%s* pays %s for *%s* ') % (
             payment['payee'], locale.format('%0.2f', payment['amount'], grouping=True),
             ','.join(payment['beneficiary']))

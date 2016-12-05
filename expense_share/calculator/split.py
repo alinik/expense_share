@@ -3,9 +3,9 @@ import itertools
 MIN_ACCEPTED = 0.1
 
 
-def calculate_owns(data):
-    members = dict.fromkeys(data['members'], 0)
-    for payment in data['payments']:
+def calculate_owns(members, payments):
+    members = dict.fromkeys(members,0)
+    for payment in payments:
         members[payment['payee']] += payment['amount']
         dept_amount = payment['amount'] // len(payment['beneficiary'])
         for dept in payment['beneficiary']:
@@ -46,10 +46,10 @@ def optimized(data):
         for t in itertools.combinations(data.items(), x):
             if abs(sum([v for k, v in t])) < MIN_ACCEPTED:
                 new_data = dict(t)
-                result+=calculate_payables(new_data)
+                result += calculate_payables(new_data)
                 _ = [data.pop(k) for k, v in t]
     if data:
-        result+=calculate_payables(data)
+        result += calculate_payables(data)
     return result
 
 
@@ -59,10 +59,10 @@ if __name__ == '__main__':
                       {'description': '\nHome', 'beneficiary': {'B', 'C', 'A'}, 'amount': 69000, 'payee': 'C'}]}
     m = calculate_owns(t)
     m = dict(a=100, b=50, c=-40, d=-10, e=-100)
-    m = dict(a=10, b=-49, c=-50, d=65, e=-75, f=-99) # http://stackoverflow.com/a/1163209/501979
+    m = dict(a=10, b=-49, c=-50, d=65, e=-75, f=-99)  # http://stackoverflow.com/a/1163209/501979
     print('M:', m)
     v = calculate_payables(m)
     print('V', v)
     m = dict(a=-10, b=-49, c=-50, d=-65, e=75, f=99)
-    print('optimized:',optimized(m))
+    print('optimized:', optimized(m))
     #

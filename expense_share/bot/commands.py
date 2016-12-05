@@ -6,15 +6,16 @@ from raven import Client
 from telegram import ReplyKeyboardMarkup
 from telegram.contrib.botan import Botan
 
+import models
 from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
 from calculator import optimized
 from settings import BOTAN_TOKEN, ADMIN_IDS, SENTRY_DSN
-from utils import get_translate
+from utils import get_translate, get_redis
 
 client = Client(SENTRY_DSN)
 
-_=get_translate('fa')
+_ = get_translate('fa')
 
 kbd_main_menu = ReplyKeyboardMarkup(
     keyboard=[[_('Add Member'), _('Add Payment')],
@@ -27,8 +28,8 @@ botan = Botan(BOTAN_TOKEN)
 
 def reset(bot, update, user_data):
     user_data.clear()
-    user_data['payments'] = []
-    user_data['members'] = set()
+    models.User.flush_members(update.message.chat_id)
+    models.User.flush_payments(update.message.chat_id)
     update.message.reply_text(_("Let's Start ..."), reply_markup=kbd_main_menu)
 
     return CHOOSING
@@ -45,19 +46,18 @@ def start(bot, update, user_data=None):
     update.message.reply_text(_("Hi, I will calculate your Expense Share"),
                               reply_markup=kbd_main_menu)
     user_data.clear()
-    user_data['payments'] = []
-    user_data['members'] = set()
+    models.User.flush_members(update.message.chat_id)
+    models.User.flush_payments(update.message.chat_id)
     return CHOOSING
-
-
-def cmd_main_menu(bot, update, user_data):
-    pass
 
 
 def show_result(bot, update, user_data):
     response = ''
     botan.track(update.message, 'show result')
-    for payer, payee, amount in optimized(calculate_owns(user_data)):
+    members = models.User.get_members(update.message.chat_id)
+    payments = models.User.get_payments(update.message.chat_id)
+
+    for payer, payee, amount in optimized(calculate_owns(members, payments)):
         response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
     if not response:
         response = _('The result is empty')
@@ -80,16 +80,17 @@ def add_member_cb(bot, update, user_data=None):
     else:
         logging.info('ADD_MEMBER_CB received: %s', text)
         member = text
-    user_data['members'].add(member)
-    logging.info('Members: %s', user_data['members'])
+    models.User.add_members(update.message.chat_id, member)
     bot.sendMessage(chat_id=update.message.chat_id, text=_('Aha'), reply_markup=kbd_main_menu)
     return CHOOSING
 
 
 def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
-
-    client.captureMessage(error, extra={'update': update.to_dict()})
+    result = {}
+    if update:
+        result = update.to_dict()
+    client.captureMessage(error, extra={'update': result})
 
 
 def welcome_admins(bot, admin_ids):
@@ -98,7 +99,6 @@ def welcome_admins(bot, admin_ids):
                         parse_mode='Markdown')
 
 
-def done(bot, update, user_data):
-    update.message.reply_text(_("Lets Restart!"), reply_markup=kbd_main_menu)
-    user_data.clear()
+def bad_command(bot, update, user_data):
+    update.message.reply_text(_("I couldn't understand!"), reply_markup=kbd_main_menu)
     return CHOOSING
