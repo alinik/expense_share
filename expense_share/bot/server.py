@@ -9,7 +9,8 @@ from telegram.ext import Updater
 
 from bot import states
 from utils import get_translate
-from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset, bad_command
+from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset, bad_command, \
+    report_msg
 from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment, \
     list_transactions, key_pressed
 
@@ -36,26 +37,29 @@ def start_bot(token, admin_ids):
                              pass_user_data=True),
                 RegexHandler('^(Add Member|%s)$' % _('Add Member'),
                              add_member, pass_user_data=True),
-                MessageHandler(Filters.contact,
-                               add_member, pass_user_data=True),
                 RegexHandler('^(Add Payment|%s)$' % _('Add Payment'),
                              add_payment, pass_user_data=True),
                 RegexHandler('^(List Transactions|%s)$' % _('List Transactions'),
                              list_transactions, pass_user_data=True),
-
+                MessageHandler(Filters.forwarded,report_msg)
             ],
 
             states.ADD_MEMBER: [
                 MessageHandler(Filters.text,
                                add_member_cb,
                                pass_user_data=True),
+                MessageHandler(Filters.contact,
+                               add_member_cb, pass_user_data=True),
+
             ],
 
             states.ADD_PAYMENT: [
-                MessageHandler(Filters.text,
-                               get_amount,
-                               pass_user_data=True),
-                CallbackQueryHandler(choose_payee, pass_user_data=True)
+                # MessageHandler(Filters.text,
+                #                get_amount,
+                #                pass_user_data=True),
+                CallbackQueryHandler(choose_payee, pass_user_data=True),
+                MessageHandler(Filters.all, bad_command, pass_user_data=True),
+
             ],
             states.ADD_PAYMENT_2: [
                 RegexHandler('^(Done|Cancel|%s|%s)$' % (_("Done"), _('Cancel')), submit_payment, pass_user_data=True),
@@ -64,6 +68,8 @@ def start_bot(token, admin_ids):
             ],
             states.CALCULATOR: [
                 CallbackQueryHandler(key_pressed, pass_user_data=True),
+                MessageHandler(Filters.all, bad_command, pass_user_data=True),
+
             ],
 
         },

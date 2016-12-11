@@ -1,7 +1,7 @@
 import logging
 
 from emoji import emojize
-from ownbot.auth import assign_first_to
+from ownbot.auth import assign_first_to, requires_usergroup
 from raven import Client
 from telegram import ReplyKeyboardMarkup
 from telegram.contrib.botan import Botan
@@ -11,9 +11,12 @@ from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
 from calculator import optimized
 from settings import BOTAN_TOKEN, ADMIN_IDS, SENTRY_DSN
-from utils import get_translate, get_redis
+from utils import get_translate
 
-client = Client(SENTRY_DSN)
+if SENTRY_DSN:
+    client = Client(SENTRY_DSN)
+else:
+    client = None
 
 _ = get_translate('fa')
 
@@ -42,7 +45,6 @@ def start(bot, update, user_data=None):
             update.message.chat.first_name, update.message.chat.last_name,
             update.message.chat.username))
 
-
     logging.info('START chat: %s', update.message.chat_id)
     botan.track(update.message, '/start')
     update.message.reply_text(_("Hi, I will calculate your Expense Share"),
@@ -54,6 +56,12 @@ def start(bot, update, user_data=None):
     return CHOOSING
 
 
+def send_ads(bot, update, user_data):
+    from_user, adv_id = models.Bot.get_ads(update.message.chat_id)
+    bot.forwardMessage(chat_id=update.message.chat_id, from_chat_id=from_user, message_id=adv_id)
+    return
+
+
 def show_result(bot, update, user_data):
     response = ''
     botan.track(update.message, 'show result')
@@ -61,10 +69,11 @@ def show_result(bot, update, user_data):
     payments = models.User.get_payments(update.message.chat_id)
 
     for payer, payee, amount in optimized(calculate_owns(members, payments)):
-        response += _('%s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
+        response += _('User %s :arrow_right: %s :moneybag: %s\n') % (payer, payee, amount)
     if not response:
         response = _('The result is empty')
     update.message.reply_text(emojize(response, True), reply_markup=kbd_main_menu)
+    send_ads(bot, update, user_data)
     return CHOOSING
 
 
@@ -93,16 +102,26 @@ def error(bot, update, error):
     result = {}
     if update:
         result = update.to_dict()
-    client.captureMessage(error, extra={'update': result})
+    if client:
+        client.captureMessage(error, extra={'update': result})
 
 
 def welcome_admins(bot, admin_ids):
     members_count = models.Bot.members_count()
     for admin_id in admin_ids:
-        bot.sendMessage(chat_id=admin_id, text='Starting bot...\n\n\n*Bot started with %s users*\n\n\nHello *Admin*'%members_count,
+        bot.sendMessage(chat_id=admin_id,
+                        text='Starting bot...\n\n\n*Bot started with %s users*\n\n\nHello *Admin*' % members_count,
                         parse_mode='Markdown')
 
 
 def bad_command(bot, update, user_data):
     update.message.reply_text(_("I couldn't understand!"), reply_markup=kbd_main_menu)
+    for admin_id in ADMIN_IDS:
+        bot.forwardMessage(chat_id=admin_id, from_chat_id=update.message.chat_id, message_id=update.message.message_id)
     return CHOOSING
+
+
+@requires_usergroup("admin","managers")
+def report_msg(bot, update):
+    update.message.reply_text("This message has following ID:")
+    update.message.reply_text("%s:%s" % (update.message.chat_id, update.message.message_id))

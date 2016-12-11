@@ -69,7 +69,7 @@ def add_payment(bot, update, user_data=None):
 
 
 def get_amount(bot, update, user_data=None, amount=0):
-    query = update.callback_query
+    query = update.callback_query or update
     members = models.User.get_members(query.message.chat_id)
 
     kbd_members = InlineKeyboardMarkup(
@@ -77,11 +77,18 @@ def get_amount(bot, update, user_data=None, amount=0):
          members])
 
     user_data['uncommitted_payment']['amount'] = int(amount)
-    bot.editMessageText(
-        text=_('%s Paid for %s, who was beneficiary?') % (user_data['uncommitted_payment']['payee'], amount),
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
-        reply_markup=kbd_members)
+    if update.callback_query:
+        bot.editMessageText(
+            text=_('%s Paid for %s, who was beneficiary?') % (user_data['uncommitted_payment']['payee'], amount),
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id,
+            reply_markup=kbd_members)
+    else:
+        bot.sendMessage(
+            text=_('%s Paid for %s, who was beneficiary?') % (user_data['uncommitted_payment']['payee'], amount),
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id,
+            reply_markup=kbd_members)
     return ADD_PAYMENT_2
 
 
@@ -148,6 +155,7 @@ def message(bot, update, user_data=None):
     text = update.message.text
     u = user_data['uncommitted_payment']
     u['description'] += '\n' + text
+    update.message.reply_text(_('And anything to add or Done?'))
     return ADD_PAYMENT_2
 
 
@@ -155,6 +163,8 @@ def submit_payment(bot, update, user_data):
     if update.message.text in ['Cancel', _('Cancel')]:
         update.message.reply_text(_("Payment Cancelled"), reply_markup=kbd_main_menu)
     else:
+        if not user_data['uncommitted_payment']['beneficiary']:
+            return get_amount(bot, update, user_data, user_data['uncommitted_payment']['amount'])
         update.message.reply_text(_("Payment Added"), reply_markup=kbd_main_menu)
         payment = user_data['uncommitted_payment'].copy()
         payment['description'] = payment['description'][1:]
