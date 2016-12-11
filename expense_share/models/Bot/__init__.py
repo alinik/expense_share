@@ -16,9 +16,13 @@ def members_count():
     return db.scard('BOT:' + PUB_TOKEN)
 
 
+def get_adv_key():
+    return 'BOT:%s:ADS' % PUB_TOKEN
+
+
 def get_ads(chat_id):
-    add_ads = 'BOT:%s:ADS' % PUB_TOKEN
-    my_ads = 'BOT:%s:SEEN_ADS:%s' % (PUB_TOKEN,chat_id)
+    add_ads = get_adv_key()
+    my_ads = 'BOT:%s:SEEN_ADS:%s' % (PUB_TOKEN, chat_id)
     remain_ads = db.sdiff(add_ads, my_ads, my_ads)
     if not remain_ads:
         return ADS_ID

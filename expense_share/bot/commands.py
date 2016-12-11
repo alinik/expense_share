@@ -121,7 +121,7 @@ def bad_command(bot, update, user_data):
     return CHOOSING
 
 
-@requires_usergroup("admin","managers")
+@requires_usergroup("admin", "managers")
 def report_msg(bot, update):
-    update.message.reply_text("This message has following ID:")
+    update.message.reply_text("This message has following ID for Bot:  %s", models.Bot.get_adv_key())
     update.message.reply_text("%s:%s" % (update.message.chat_id, update.message.message_id))
