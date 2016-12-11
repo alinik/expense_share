@@ -25,6 +25,7 @@ def get_ads(chat_id):
     my_ads = 'BOT:%s:SEEN_ADS:%s' % (PUB_TOKEN, chat_id)
     remain_ads = db.sdiff(add_ads, my_ads, my_ads)
     if not remain_ads:
+        db.delete(my_ads)
         return ADS_ID
     item = random.choice(list(remain_ads))
     db.sadd(my_ads, item)
