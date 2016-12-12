@@ -1,35 +1,32 @@
 import logging
 
 from emoji import emojize
-from ownbot.auth import assign_first_to, requires_usergroup
-from raven import Client
 from telegram import ReplyKeyboardMarkup
-from telegram.contrib.botan import Botan
 
 import models
+from bot import states, botan
+from bot.admin_commands import send_ads
 from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
 from calculator import optimized
-from settings import BOTAN_TOKEN, ADMIN_IDS, SENTRY_DSN
+from models import User
+from settings import ADMIN_IDS
 from utils import get_translate
-
-if SENTRY_DSN:
-    client = Client(SENTRY_DSN)
-else:
-    client = None
 
 _ = get_translate('fa')
 
-kbd_main_menu = ReplyKeyboardMarkup(
-    keyboard=[[_('Add Member'), _('Add Payment')],
-              [_('Show Result'), _('List Transactions'), _('Help')],
-              [_('Lets Restart!')]],
-    resize_keyboard=True,
-    one_time_keyboard=True)
-botan = Botan(BOTAN_TOKEN)
-
 
 def reset(bot, update, user_data):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
     user_data.clear()
     models.User.flush_members(update.message.chat_id)
     models.User.flush_payments(update.message.chat_id)
@@ -38,31 +35,16 @@ def reset(bot, update, user_data):
     return CHOOSING
 
 
-@assign_first_to("admin")
-def start(bot, update, user_data=None):
-    for ids in ADMIN_IDS:
-        bot.sendMessage(chat_id=ids, text='New user joined. %s %s (@%s)' % (
-            update.message.chat.first_name, update.message.chat.last_name,
-            update.message.chat.username))
-
-    logging.info('START chat: %s', update.message.chat_id)
-    botan.track(update.message, '/start')
-    update.message.reply_text(_("Hi, I will calculate your Expense Share"),
-                              reply_markup=kbd_main_menu)
-    user_data.clear()
-    models.User.flush_members(update.message.chat_id)
-    models.User.flush_payments(update.message.chat_id)
-    models.Bot.add_member(update.message.chat_id)
-    return CHOOSING
-
-
-def send_ads(bot, update, user_data):
-    from_user, adv_id = models.Bot.get_ads(update.message.chat_id)
-    bot.forwardMessage(chat_id=update.message.chat_id, from_chat_id=from_user, message_id=adv_id)
-    return
-
-
 def show_result(bot, update, user_data):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
     response = ''
     botan.track(update.message, 'show result')
     members = models.User.get_members(update.message.chat_id)
@@ -78,12 +60,23 @@ def show_result(bot, update, user_data):
 
 
 def add_member(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
     logging.info('ADDMEMBER chat: %s', update.message.chat_id)
     bot.sendMessage(chat_id=update.message.chat_id, text=_('Please type new Member Name'))
     return ADD_MEMBER
 
 
 def add_member_cb(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
     text = update.message.text
     contact = update.message.contact
     if contact:
@@ -97,31 +90,19 @@ def add_member_cb(bot, update, user_data=None):
     return CHOOSING
 
 
-def error(bot, update, error):
-    logging.warning('Update "%s" caused error "%s"' % (update, error))
-    result = {}
-    if update:
-        result = update.to_dict()
-    if client:
-        client.captureMessage(error, extra={'update': result})
-
-
-def welcome_admins(bot, admin_ids):
-    members_count = models.Bot.members_count()
-    for admin_id in admin_ids:
-        bot.sendMessage(chat_id=admin_id,
-                        text='Starting bot...\n\n\n*Bot started with %s users*\n\n\nHello *Admin*' % members_count,
-                        parse_mode='Markdown')
-
-
 def bad_command(bot, update, user_data):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
     update.message.reply_text(_("I couldn't understand!"), reply_markup=kbd_main_menu)
     for admin_id in ADMIN_IDS:
-        bot.forwardMessage(chat_id=admin_id, from_chat_id=update.message.chat_id, message_id=update.message.message_id)
-    return CHOOSING
-
-
-@requires_usergroup("admin", "managers")
-def report_msg(bot, update):
-    update.message.reply_text("This message has following ID for Bot:  %s"% models.Bot.get_adv_key())
-    update.message.reply_text("%s:%s" % (update.message.chat_id, update.message.message_id))
+        bot.forwardMessage(chat_id=admin_id, from_chat_id=update.message.chat_id,
+                           message_id=update.message.message_id)
+    return states.CHOOSING

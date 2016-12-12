@@ -1,8 +1,11 @@
 import ujson
 
-from utils import get_redis
+from utils import get_redis, get_translate
+from models.Bot import PUB_TOKEN
 
 db = get_redis()
+
+PREFIX = 'BOT:%s:USER' % PUB_TOKEN
 
 
 def add_members(uid, member):
@@ -28,3 +31,21 @@ def get_payments(uid):
 
 def flush_payments(uid):
     return db.delete('USER:%s:%s' % (uid, 'PAYMENTS'))
+
+
+def set_lang(uid, lang):
+    return db.hset("%s:SETTINGS:%s" % (PREFIX, uid), "LANG", lang)
+
+
+def get_lang(uid):
+    return db.hget("%s:SETTINGS:%s" % (PREFIX, uid), "LANG")
+
+
+def get_my_lang(update):
+    uid = ''
+    if update:
+        if update.message:
+            uid = update.message.chat_id
+        elif update.callback_query:
+            uid = update.callback_query.message.chat_id
+    return get_translate(get_lang(uid))

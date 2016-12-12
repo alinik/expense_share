@@ -9,10 +9,11 @@ from telegram.ext import Updater
 
 from bot import states
 from utils import get_translate
-from .commands import start, add_member, add_member_cb, error, welcome_admins, show_result, reset, bad_command, \
-    report_msg
-from .payment_commands import add_payment, choose_payee, get_amount, choose_beneficiary, message, submit_payment, \
-    list_transactions, key_pressed
+from .commands import add_member, add_member_cb, show_result, reset
+from bot.admin_commands import start, error, welcome_admins, report_msg, choose_lang_cb, choose_lang
+from bot.commands import bad_command
+from .payment_commands import add_payment, choose_payee, choose_beneficiary, message, submit_payment, list_transactions, \
+    key_pressed
 
 _ = get_translate('fa')
 
@@ -41,7 +42,7 @@ def start_bot(token, admin_ids):
                              add_payment, pass_user_data=True),
                 RegexHandler('^(List Transactions|%s)$' % _('List Transactions'),
                              list_transactions, pass_user_data=True),
-                MessageHandler(Filters.forwarded,report_msg)
+                MessageHandler(Filters.forwarded, report_msg)
             ],
 
             states.ADD_MEMBER: [
@@ -71,11 +72,16 @@ def start_bot(token, admin_ids):
                 MessageHandler(Filters.all, bad_command, pass_user_data=True),
 
             ],
+            states.CHOOSE_LANG: [
+                CallbackQueryHandler(choose_lang_cb, pass_user_data=True),
+
+            ]
 
         },
 
         fallbacks=[
             CommandHandler('reset', reset, pass_user_data=True),
+            CommandHandler('lang', choose_lang, pass_user_data=True),
             MessageHandler(Filters.all, bad_command, pass_user_data=True),
         ]
     )

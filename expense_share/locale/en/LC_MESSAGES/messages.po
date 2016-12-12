@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2016-12-12 18:07+IRST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: bot/admin_commands.py:16
+msgid "Please choose your language"
+msgstr ""
+
+#: bot/admin_commands.py:18
+msgid "Persian"
+msgstr ""
+
+#: bot/admin_commands.py:31 bot/admin_commands.py:50 bot/commands.py:23
+#: bot/commands.py:42 bot/commands.py:73 bot/commands.py:97
+#: bot/payment_commands.py:67 bot/payment_commands.py:186 bot/server.py:39
+msgid "Add Member"
+msgstr ""
+
+#: bot/admin_commands.py:31 bot/admin_commands.py:50 bot/commands.py:23
+#: bot/commands.py:42 bot/commands.py:73 bot/commands.py:97
+#: bot/payment_commands.py:67 bot/payment_commands.py:186 bot/server.py:41
+msgid "Add Payment"
+msgstr ""
+
+#: bot/admin_commands.py:32 bot/admin_commands.py:51 bot/commands.py:24
+#: bot/commands.py:43 bot/commands.py:74 bot/commands.py:98
+#: bot/payment_commands.py:68 bot/payment_commands.py:187
+msgid "Help"
+msgstr ""
+
+#: bot/admin_commands.py:32 bot/admin_commands.py:51 bot/commands.py:24
+#: bot/commands.py:43 bot/commands.py:74 bot/commands.py:98
+#: bot/payment_commands.py:68 bot/payment_commands.py:187 bot/server.py:33
+msgid "Show Result"
+msgstr ""
+
+#: bot/admin_commands.py:32 bot/admin_commands.py:51 bot/commands.py:24
+#: bot/commands.py:43 bot/commands.py:74 bot/commands.py:98
+#: bot/payment_commands.py:68 bot/payment_commands.py:187 bot/server.py:43
+msgid "List Transactions"
+msgstr ""
+
+#: bot/admin_commands.py:33 bot/admin_commands.py:52 bot/commands.py:25
+#: bot/commands.py:44 bot/commands.py:75 bot/commands.py:99
+#: bot/payment_commands.py:69 bot/payment_commands.py:188 bot/server.py:36
+msgid "Lets Restart!"
+msgstr ""
+
+#: bot/admin_commands.py:38
+msgid "You choose English for your default lang"
+msgstr ""
+
+#: bot/admin_commands.py:64
+msgid "Hi, I will calculate your Expense Share"
+msgstr ""
+
+#: bot/commands.py:33
+msgid "Let's Start ..."
+msgstr ""
+
+#: bot/commands.py:54
+msgid ""
+"User %s :arrow_right: %s :moneybag: %s\n"
+msgstr ""
+
+#: bot/commands.py:56 bot/payment_commands.py:221
+msgid "The result is empty"
+msgstr ""
+
+#: bot/commands.py:65
+msgid "Please type new Member Name"
+msgstr ""
+
+#: bot/commands.py:89
+msgid "Aha"
+msgstr ""
+
+#: bot/commands.py:104
+msgid "I couldn't understand!"
+msgstr ""
+
+#: bot/payment_commands.py:18
+msgid "1"
+msgstr ""
+
+#: bot/payment_commands.py:18
+msgid "2"
+msgstr ""
+
+#: bot/payment_commands.py:18
+msgid "3"
+msgstr ""
+
+#: bot/payment_commands.py:19
+msgid "4"
+msgstr ""
+
+#: bot/payment_commands.py:19
+msgid "5"
+msgstr ""
+
+#: bot/payment_commands.py:19
+msgid "6"
+msgstr ""
+
+#: bot/payment_commands.py:20
+msgid "7"
+msgstr ""
+
+#: bot/payment_commands.py:20
+msgid "8"
+msgstr ""
+
+#: bot/payment_commands.py:20
+msgid "9"
+msgstr ""
+
+#: bot/payment_commands.py:21
+msgid "0"
+msgstr ""
+
+#: bot/payment_commands.py:21
+msgid "000"
+msgstr ""
+
+#: bot/payment_commands.py:21
+msgid ":arrow_backward:"
+msgstr ""
+
+#: bot/payment_commands.py:22
+msgid ":white_check_mark:"
+msgstr ""
+
+#: bot/payment_commands.py:30
+msgid " paid,"
+msgstr ""
+
+#: bot/payment_commands.py:32 bot/payment_commands.py:56
+msgid " how much?"
+msgstr ""
+
+#: bot/payment_commands.py:76
+msgid "Please add some members first!"
+msgstr ""
+
+#: bot/payment_commands.py:81
+msgid "Who Paid? "
+msgstr ""
+
+#: bot/payment_commands.py:97 bot/payment_commands.py:103
+msgid "%s Paid for %s, who was beneficiary?"
+msgstr ""
+
+#: bot/payment_commands.py:115
+msgid "paid,"
+msgstr ""
+
+#: bot/payment_commands.py:131 bot/payment_commands.py:163
+msgid "So, %s paid %s for %s."
+msgstr ""
+
+#: bot/payment_commands.py:134 bot/payment_commands.py:178
+msgid "And anything to add or Done?"
+msgstr ""
+
+#: bot/payment_commands.py:136 bot/payment_commands.py:193 bot/server.py:66
+msgid "Cancel"
+msgstr ""
+
+#: bot/payment_commands.py:136 bot/server.py:66
+msgid "Done"
+msgstr ""
+
+#: bot/payment_commands.py:194
+msgid "Payment Cancelled"
+msgstr ""
+
+#: bot/payment_commands.py:198
+msgid "Payment Added"
+msgstr ""
+
+#: bot/payment_commands.py:214
+msgid "*%s* pays %s for *%s* "
+msgstr ""
+

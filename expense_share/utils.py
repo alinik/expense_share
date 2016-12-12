@@ -7,8 +7,14 @@ from settings import REDIS
 _langs = {}
 _redis_db = None
 
+
 def get_translate(lang='fa'):
     global _langs
+    if not lang:
+        return gettext.gettext
+    if isinstance(lang, bytes):
+        lang = lang.decode('utf-8')
+
     if lang in _langs:
         return _langs[lang]
     fa = gettext.translation('messages', localedir='locale', languages=[lang])
@@ -22,4 +28,3 @@ def get_redis(db=0):
     if not _redis_db:
         _redis_db = redis.StrictRedis(db=db, **REDIS)
     return _redis_db
-

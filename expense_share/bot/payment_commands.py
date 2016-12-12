@@ -6,14 +6,14 @@ from telegram import ReplyKeyboardMarkup
 
 import locale
 import models
-from bot.commands import kbd_main_menu
 from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING, CALCULATOR
-from utils import get_translate
-
-_ = get_translate('fa')
+from models import User
 
 
-def calc_kbd():
+
+def calc_kbd(update):
+    _ = User.get_my_lang(update)
+
     return InlineKeyboardMarkup([InlineKeyboardButton(emojize(x, True), callback_data=x) for x in t] for t in
                                 [[_('1'), _('2'), _('3')],
                                  [_('4'), _('5'), _('6')],
@@ -23,20 +23,24 @@ def calc_kbd():
 
 
 def show_calculator(bot, update, user_data):
+
     query = update.callback_query
+    _ = User.get_my_lang(query)
     user_data['calc'] = ''
     user_data['calc:orig_msg'] = query.data + _(' paid,')
     bot.editMessageText(
         text=user_data['calc:orig_msg'] + _(" how much?") + "\n ----------------------------------",
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-        reply_markup=calc_kbd())
+        reply_markup=calc_kbd(query))
     bot.answerCallbackQuery(query.id)
 
     return CALCULATOR
 
 
 def key_pressed(bot, update, user_data):
+    _ = User.get_my_lang(update)
+
     query = update.callback_query
     if query.data == ':white_check_mark:':
         del user_data['calc:orig_msg']
@@ -52,11 +56,21 @@ def key_pressed(bot, update, user_data):
         text=user_data['calc:orig_msg'] + _(" how much?") + user_data['calc'],
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-        reply_markup=calc_kbd())
+        reply_markup=calc_kbd(query))
     return CALCULATOR
 
 
 def add_payment(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
     members = models.User.get_members(update.message.chat_id)
     if not members:
         update.message.reply_text(_('Please add some members first!'), reply_markup=kbd_main_menu)
@@ -69,6 +83,7 @@ def add_payment(bot, update, user_data=None):
 
 
 def get_amount(bot, update, user_data=None, amount=0):
+    _ = User.get_my_lang(update)
     query = update.callback_query or update
     members = models.User.get_members(query.message.chat_id)
 
@@ -93,19 +108,22 @@ def get_amount(bot, update, user_data=None, amount=0):
 
 
 def choose_payee(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
     query = update.callback_query
     user_data['uncommitted_payment']['payee'] = query.data
     user_data['next state'] = get_amount
     bot.editMessageText(text=query.data + _("paid,"),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
-                        reply_markup=calc_kbd())
+                        reply_markup=calc_kbd(update))
     # bot.answerCallbackQuery(query.id)
     return show_calculator(bot, update, user_data)
 
 
 # noinspection PyUnresolvedReferences
 def choose_beneficiary(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
+
     query = update.callback_query
     u = user_data['uncommitted_payment']
     if query.data == '!done':
@@ -152,6 +170,8 @@ def choose_beneficiary(bot, update, user_data=None):
 
 
 def message(bot, update, user_data=None):
+    _ = User.get_my_lang(update)
+
     text = update.message.text
     u = user_data['uncommitted_payment']
     u['description'] += '\n' + text
@@ -160,6 +180,16 @@ def message(bot, update, user_data=None):
 
 
 def submit_payment(bot, update, user_data):
+    _ = User.get_my_lang(update)
+
+    kbd_main_menu = ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Help')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
     if update.message.text in ['Cancel', _('Cancel')]:
         update.message.reply_text(_("Payment Cancelled"), reply_markup=kbd_main_menu)
     else:
@@ -176,6 +206,7 @@ def submit_payment(bot, update, user_data):
 
 # noinspection PyUnresolvedReferences
 def list_transactions(bot, update, user_data):
+    _ = User.get_my_lang(update)
     response = ''
     payments = models.User.get_payments(update.message.chat_id)
 
