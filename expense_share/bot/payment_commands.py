@@ -6,9 +6,9 @@ from telegram import ReplyKeyboardMarkup
 
 import locale
 import models
+from bot import default_menu
 from bot.states import ADD_PAYMENT, ADD_PAYMENT_2, CHOOSING, CALCULATOR
 from models import User
-
 
 
 def calc_kbd(update):
@@ -23,7 +23,6 @@ def calc_kbd(update):
 
 
 def show_calculator(bot, update, user_data):
-
     query = update.callback_query
     _ = User.get_my_lang(query)
     user_data['calc'] = ''
@@ -63,13 +62,7 @@ def key_pressed(bot, update, user_data):
 def add_payment(bot, update, user_data=None):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
-
+    kbd_main_menu = default_menu(_)
 
     members = models.User.get_members(update.message.chat_id)
     if not members:
@@ -182,13 +175,7 @@ def message(bot, update, user_data=None):
 def submit_payment(bot, update, user_data):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
-
+    kbd_main_menu = default_menu(_)
 
     if update.message.text in ['Cancel', _('Cancel')]:
         update.message.reply_text(_("Payment Cancelled"), reply_markup=kbd_main_menu)
@@ -219,5 +206,6 @@ def list_transactions(bot, update, user_data):
         response += '.\n'
     if not response:
         response = _('The result is empty')
+    kbd_main_menu = default_menu(_)
     update.message.reply_text(response, parse_mode='Markdown', reply_markup=kbd_main_menu)
     return CHOOSING

@@ -8,10 +8,10 @@ from telegram.ext import RegexHandler
 from telegram.ext import Updater
 
 from bot import states
-from utils import get_translate
-from .commands import add_member, add_member_cb, show_result, reset
 from bot.admin_commands import start, error, welcome_admins, report_msg, choose_lang_cb, choose_lang
 from bot.commands import bad_command
+from utils import get_translate
+from .commands import add_member, add_member_cb, show_result, reset
 from .payment_commands import add_payment, choose_payee, choose_beneficiary, message, submit_payment, list_transactions, \
     key_pressed
 
@@ -33,6 +33,8 @@ def start_bot(token, admin_ids):
                 RegexHandler('^(Show Result|%s)$' % _('Show Result'),
                              show_result,
                              pass_user_data=True),
+                RegexHandler('^(Select Language|%s)' % _('Select Language'),
+                             choose_lang),
                 RegexHandler('^(Lets Restart!|%s)$' % _('Lets Restart!'),
                              reset,
                              pass_user_data=True),
@@ -81,7 +83,7 @@ def start_bot(token, admin_ids):
 
         fallbacks=[
             CommandHandler('reset', reset, pass_user_data=True),
-            CommandHandler('lang', choose_lang, pass_user_data=True),
+            CommandHandler('lang', choose_lang),
             MessageHandler(Filters.all, bad_command, pass_user_data=True),
         ]
     )

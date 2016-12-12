@@ -171,3 +171,18 @@ msgstr "من متوجه نشدم!"
 
 msgid "Please choose your language"
 msgstr "لطفا زبان خود را انتخاب کنید"
+
+msgid "Persian"
+msgstr "فارسی"
+
+msgid "OK Lets start"
+msgstr "بسیار خب، شروع کنیم"
+
+msgid "You choose English for your default lang"
+msgstr "شما زبان فارسی را به عنوان پیشفرض انتخاب کردید"
+
+msgid "Select Language"
+msgstr "انتخاب زبان"
+
+msgid "en"
+msgstr "fa"

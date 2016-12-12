@@ -6,13 +6,14 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import ReplyKeyboardMarkup
 
 import models
-from bot import states, botan, client
+import utils
+from bot import states, botan, client, default_menu
 from models import User
 from settings import ADMIN_IDS
 
 
 def choose_lang(bot, update):
-    _ = User.get_my_lang(update)
+    _ = utils.get_translate('fa')
     update.message.reply_text('Please choose your language\n%s' % _("Please choose your language"),
                               reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('English', callback_data='en'),
                                                                   InlineKeyboardButton(_('Persian'),
@@ -28,18 +29,13 @@ def choose_lang_cb(bot, update, user_data=None):
         models.User.set_lang(query.message.chat_id, 'en')
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
+    kbd_main_menu = default_menu(_)
     bot.answerCallbackQuery(query.id)
     bot.editMessageText(
         text=_("You choose English for your default lang"),
         chat_id=query.message.chat_id,
         message_id=query.message.message_id)
-    update.message.reply_markup(_('OK Lets start'),
+    bot.sendMessage(text=_('OK Lets start'),chat_id=query.message.chat_id,
                                 reply_markup=kbd_main_menu)
     return states.CHOOSING
 
@@ -48,12 +44,7 @@ def choose_lang_cb(bot, update, user_data=None):
 def start(bot, update, user_data=None):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
+    kbd_main_menu = default_menu(_)
 
     for ids in ADMIN_IDS:
         bot.sendMessage(chat_id=ids, text='New user joined. %s %s (@%s)' % (

@@ -10,4 +10,14 @@ else:
     client = None
 botan = Botan(BOTAN_TOKEN)
 
+
+def default_menu(_):
+    return ReplyKeyboardMarkup(
+        keyboard=[[_('Add Member'), _('Add Payment')],
+                  [_('Show Result'), _('List Transactions'), _('Select Language')+' '+_('en')],
+                  [_('Lets Restart!')]],
+        resize_keyboard=True,
+        one_time_keyboard=True)
+
+
 from .server import start_bot

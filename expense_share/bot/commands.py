@@ -4,7 +4,7 @@ from emoji import emojize
 from telegram import ReplyKeyboardMarkup
 
 import models
-from bot import states, botan
+from bot import states, botan, default_menu
 from bot.admin_commands import send_ads
 from bot.states import CHOOSING, ADD_MEMBER
 from calculator import calculate_owns
@@ -19,13 +19,7 @@ _ = get_translate('fa')
 def reset(bot, update, user_data):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
-
+    kbd_main_menu = default_menu(_)
 
     user_data.clear()
     models.User.flush_members(update.message.chat_id)
@@ -38,12 +32,7 @@ def reset(bot, update, user_data):
 def show_result(bot, update, user_data):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
+    kbd_main_menu = default_menu(_)
 
     response = ''
     botan.track(update.message, 'show result')
@@ -69,13 +58,7 @@ def add_member(bot, update, user_data=None):
 def add_member_cb(bot, update, user_data=None):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
-
+    kbd_main_menu = default_menu(_)
 
     text = update.message.text
     contact = update.message.contact
@@ -93,13 +76,7 @@ def add_member_cb(bot, update, user_data=None):
 def bad_command(bot, update, user_data):
     _ = User.get_my_lang(update)
 
-    kbd_main_menu = ReplyKeyboardMarkup(
-        keyboard=[[_('Add Member'), _('Add Payment')],
-                  [_('Show Result'), _('List Transactions'), _('Help')],
-                  [_('Lets Restart!')]],
-        resize_keyboard=True,
-        one_time_keyboard=True)
-
+    kbd_main_menu = default_menu(_)
 
     update.message.reply_text(_("I couldn't understand!"), reply_markup=kbd_main_menu)
     for admin_id in ADMIN_IDS:
