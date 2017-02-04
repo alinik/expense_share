@@ -8,7 +8,7 @@ from telegram.ext import RegexHandler
 from telegram.ext import Updater
 
 from bot import states
-from bot.admin_commands import start, error, welcome_admins, report_msg, choose_lang_cb, choose_lang
+from bot.admin_commands import start, error, welcome_admins, report_msg, choose_lang_cb, choose_lang, show_help
 from bot.commands import bad_command
 from utils import get_translate
 from .commands import add_member, add_member_cb, show_result, reset
@@ -84,6 +84,11 @@ def start_bot(token, admin_ids):
         fallbacks=[
             CommandHandler('reset', reset, pass_user_data=True),
             CommandHandler('lang', choose_lang),
+            CommandHandler('start', start, pass_user_data=True),
+            CommandHandler('help', show_help, pass_user_data=True),
+            RegexHandler('^(Help|%s)$' % _('Help'),
+                         show_help, pass_user_data=True),
+
             MessageHandler(Filters.all, bad_command, pass_user_data=True),
         ]
     )

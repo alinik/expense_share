@@ -9,6 +9,7 @@ import models
 import utils
 from bot import states, botan, client, default_menu
 from models import User
+from models.User import get_first_use
 from settings import ADMIN_IDS
 
 
@@ -35,8 +36,11 @@ def choose_lang_cb(bot, update, user_data=None):
         text=_("You choose English for your default lang"),
         chat_id=query.message.chat_id,
         message_id=query.message.message_id)
-    bot.sendMessage(text=_('OK Lets start'),chat_id=query.message.chat_id,
-                                reply_markup=kbd_main_menu)
+    if get_first_use(query.message.chat_id):
+        show_help(bot, update.callback_query, None)
+
+    bot.sendMessage(text=_('OK Lets start'), chat_id=query.message.chat_id,
+                    reply_markup=kbd_main_menu)
     return states.CHOOSING
 
 
@@ -53,11 +57,10 @@ def start(bot, update, user_data=None):
 
     logging.info('START chat: %s', update.message.chat_id)
     botan.track(update.message, '/start')
-    update.message.reply_text(_("Hi, I will calculate your Expense Share"),
-                              reply_markup=kbd_main_menu)
     user_data.clear()
     models.User.flush_members(update.message.chat_id)
     models.User.flush_payments(update.message.chat_id)
+    models.User.set_first_use(update.message.chat_id)
     models.Bot.add_member(update.message.chat_id)
     return choose_lang(bot, update)
 
@@ -90,3 +93,9 @@ def welcome_admins(bot, admin_ids):
 def report_msg(bot, update):
     update.message.reply_text("This message has following ID for Bot:  %s" % models.Bot.get_adv_key())
     update.message.reply_text("%s:%s" % (update.message.chat_id, update.message.message_id))
+
+
+def show_help(bot, update, user_data):
+    _ = User.get_my_lang(update)
+    kbd_main_menu = default_menu(_)
+    update.message.reply_text(_("Hi, I will calculate your Expense Share"), reply_markup=kbd_main_menu)
