@@ -33,7 +33,6 @@ def show_calculator(bot, update, user_data):
         message_id=query.message.message_id,
         reply_markup=calc_kbd(query))
     bot.answerCallbackQuery(query.id)
-
     return CALCULATOR
 
 
